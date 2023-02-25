@@ -1,0 +1,11 @@
+const languages=new Map();languages.set('en',[]);languages.set('fr',[]);languages.set('cn',[]);languages.set('pt-BR',[]);async function fetchLang(lang){const lines=await jQuery.get('/resources/js/lang/files/'+lang+'.properties')
+for(const line of lines.replace(/\\/g,"").split('\n'))
+if(!line.startsWith("#"))
+languages.get(lang)[line.split("=")[0]]=line.split("=")[1];}
+async function loadLang(lang){await fetchLang(lang);for(const elem of document.querySelectorAll("[key]")){const t=languages.get(lang)[elem.getAttribute("key")];if(!t)continue;elem.innerHTML=t;}}
+async function loadTranslations(){const lang=getLang().includes('en')?'en':getLang().includes('zh')?'cn':getLang().includes('fr')?'fr':'en'
+await loadLang(lang);for(const lang of languages.keys())
+await fetchLang(lang);}
+loadTranslations();function getLang(){return(decodeURIComponent(document.cookie).split("language=")[1]||window.navigator.language||window.navigator.userlanguage).toLowerCase();}
+for(const elm of document.getElementsByClassName('translate'))
+elm.addEventListener('click',()=>{document.cookie="language="+elm.id+"; path=/;";loadLang(elm.id)})
